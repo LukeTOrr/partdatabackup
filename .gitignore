@@ -1,0 +1,37 @@
+# Secrets & auth artifacts — never committed, never copied between projects
+.env
+token*.json
+credentials*.json
+client_secret*.json
+configuration.json
+service-account*.json
+*sa-key*.json
+cookies.json
+session.json
+*.enc
+key.key
+
+# Data lives in data/, not in git
+data/
+Downloads/
+Exports/
+*.xlsx
+*.xlsm
+*.csv
+~$*
+
+# Logs & debug artifacts
+*.log
+debug_*.html
+debug_*.png
+output.txt
+
+# Node / tooling
+node_modules/
+.claude/
+.idea/
+
+# If a file drove you to want "index - Copy.js": use git branches/history instead
+*Copy*
+*Backup*
+*-old*
