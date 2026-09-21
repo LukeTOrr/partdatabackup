@@ -2,14 +2,15 @@
   "name": "partdatabackup",
   "version": "1.0.0",
   "private": true,
-  "description": "One sentence: what business problem this solves.",
+  "description": "Snapshots, pauses, and deletes every Cloud Scheduler job in celltech-internal-tools on a set date, with one-command restore.",
   "main": "launch.js",
   "scripts": {
-    "start": "node launch.js"
+    "start": "node launch.js",
+    "teardown": "node launch.js teardown",
+    "restore": "node launch.js restore"
   },
   "dependencies": {
     "dotenv": "^16.4.5",
-    "googleapis": "^140.0.0",
-    "puppeteer": "^22.0.0"
+    "googleapis": "^140.0.0"
   }
 }

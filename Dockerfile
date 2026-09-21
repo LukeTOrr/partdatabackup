@@ -1,6 +1,4 @@
-# Only needed when this job is promoted to Cloud Run (see DEV-STANDARD.md §9).
-# Puppeteer needs Chromium's system deps — the official image ships them all.
-FROM ghcr.io/puppeteer/puppeteer:22.0.0
+FROM node:20-slim
 
 WORKDIR /usr/src/app
 
@@ -9,7 +7,6 @@ RUN npm ci --omit=dev
 
 COPY . .
 
-# Cloud Run jobs: no port needed. HEADLESS must be true in the cloud.
-ENV HEADLESS=true
-
-CMD ["node", "launch.js"]
+# ENTRYPOINT (not CMD) so `gcloud run jobs execute --args=restore` appends the mode
+# instead of replacing the whole command.
+ENTRYPOINT ["node", "launch.js"]

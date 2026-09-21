@@ -1,10 +1,8 @@
 # Deploy to Cloud Run Job — same pattern as V4Data/V4Forecast/DailyEmail.
 # Before first deploy:
-#   1. Replace JOB and IMAGE names below.
-#   2. Add repo secret GCP_SA_KEY (Settings → Secrets → Actions); value lives in
+#   1. Add repo secret GCP_SA_KEY (Settings → Secrets → Actions); value lives in
 #      GCP Secret Manager — see Automations/secrets-registry.md.
-#   3. Create each app secret in Secret Manager and list it under --set-secrets.
-#   4. Add a row to secrets-registry.md for every new secret.
+#   2. Create the Artifact Registry repo + snapshot bucket (README → First-time setup).
 name: Deploy to Cloud Run
 
 on:
@@ -16,8 +14,9 @@ on:
 env:
   PROJECT_ID: celltech-internal-tools
   REGION: us-central1
-  JOB: CHANGE-ME-job-name
-  IMAGE: us-central1-docker.pkg.dev/celltech-internal-tools/CHANGE-ME-job-name/app
+  JOB: scheduler-sunset
+  IMAGE: us-central1-docker.pkg.dev/celltech-internal-tools/scheduler-sunset/app
+  SERVICE_ACCOUNT: lukeorr@celltech-internal-tools.iam.gserviceaccount.com
 
 jobs:
   deploy:
@@ -48,17 +47,22 @@ jobs:
       - name: Deploy to Cloud Run Job
         run: |
           SECRETS="HEARTBEAT_SHEET_ID=HEARTBEAT_SHEET_ID:latest"
+          ENV_VARS="JOB_NAME=scheduler-sunset,PROJECT_ID=$PROJECT_ID,SNAPSHOT_BUCKET=celltech-internal-tools-scheduler-snapshots,SELF_TRIGGER_NAME=scheduler-sunset-trigger,DRY_RUN=false"
 
           gcloud run jobs update $JOB \
             --image $IMAGE:${{ github.sha }} \
             --region $REGION \
             --project $PROJECT_ID \
             --set-secrets "$SECRETS" \
+            --set-env-vars "$ENV_VARS" \
+            --max-retries 0 \
             --quiet \
           || gcloud run jobs create $JOB \
             --image $IMAGE:${{ github.sha }} \
             --region $REGION \
             --project $PROJECT_ID \
             --set-secrets "$SECRETS" \
-            --service-account lukeorr@celltech-internal-tools.iam.gserviceaccount.com \
+            --set-env-vars "$ENV_VARS" \
+            --max-retries 0 \
+            --service-account $SERVICE_ACCOUNT \
             --quiet
