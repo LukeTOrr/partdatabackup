@@ -5,7 +5,7 @@ Runs:        Cloud Run job `scheduler-sunset` (us-central1), fired once by Cloud
 Entry:       launch.js  (`teardown` default | `restore [snapshot object]`)
 Inputs:      Cloud Scheduler API, all regions of celltech-internal-tools
 Outputs:     gs://celltech-internal-tools-scheduler-snapshots/snapshots/<timestamp>.json + latest.json; JobLog heartbeat row
-Secrets:     .env — see .env.example  |  Secret Manager: HEARTBEAT_SHEET_ID
+Secrets:     .env — see .env.example  |  Secret Manager: none (to enable the heartbeat on Cloud Run, create HEARTBEAT_SHEET_ID and add --set-secrets to deploy.yml)
 Owner facts: Its own trigger is excluded from snapshot/delete and gets PAUSED after a teardown. Trigger time zone is America/Los_Angeles (noon Pacific, PDT/PST handled automatically).
 
 ---
