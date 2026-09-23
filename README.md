@@ -2,7 +2,7 @@
 
 What:        On a set date, snapshots → pauses → deletes EVERY Cloud Scheduler job in celltech-internal-tools; restores them with one command
 Runs:        Cloud Run job `scheduler-sunset` (us-central1), fired once by Cloud Scheduler job `scheduler-sunset-trigger`
-Entry:       launch.js  (`teardown` default | `restore [snapshot object]`)
+Entry:       set-removal-date.bat (reschedule) · restore-schedules.bat (bring schedules back) · launch.js (`teardown` default | `restore [snapshot object]`)
 Inputs:      Cloud Scheduler API, all regions of celltech-internal-tools
 Outputs:     gs://celltech-internal-tools-scheduler-snapshots/snapshots/<timestamp>.json + latest.json; JobLog heartbeat row
 Secrets:     .env — see .env.example  |  Secret Manager: none (to enable the heartbeat on Cloud Run, create HEARTBEAT_SHEET_ID and add --set-secrets to deploy.yml)
@@ -34,12 +34,21 @@ See the Commands block in the chat handoff, or:
 
 ## Change the removal date
 
+Double-click **`set-removal-date.bat`**. It shows the current date, asks for a new one
+(YYYY-MM-DD), rejects anything invalid/past/over a year out, updates the trigger,
+resumes it if a teardown had paused it, reads it back to verify, and leaves the window
+open. Time is always noon Pacific.
+
+Manually:
+
 ```
 gcloud scheduler jobs update http scheduler-sunset-trigger --location=us-central1 --project=celltech-internal-tools --schedule="0 12 <DAY> <MONTH> *" --time-zone="America/Los_Angeles"
 gcloud scheduler jobs resume scheduler-sunset-trigger --location=us-central1 --project=celltech-internal-tools
 ```
 
 ## Restore everything
+
+Double-click **`restore-schedules.bat`**, or:
 
 ```
 gcloud run jobs execute scheduler-sunset --region=us-central1 --project=celltech-internal-tools --args=restore
